@@ -6,6 +6,9 @@ import { Line } from "react-chartjs-2";
 import getGradient from "../../Utils/getGradient";
 import {
   Chart as ChartJS,
+  ChartData,
+  ChartOptions,
+  ChartDataset,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -66,7 +69,7 @@ export default function LineChart() {
     return formattedDate;
   });
 
-  const data = {
+  const data: ChartData<"line", number[], string> = {
     labels,
     datasets: [
       {
@@ -85,7 +88,7 @@ export default function LineChart() {
           }
           return getGradient(ctx, chartArea);
         },
-      },
+      } as ChartDataset<"line", number[]>,
     ],
   };
 
