@@ -31,8 +31,10 @@ ChartJS.register(
 );
 
 export default function LineChart() {
-  const [bitcoinPrice, setBitcoinPrice] = useState([]);
-  const [bitcoinVolume, setBitcoinVolume] = useState([]);
+  const [bitcoinPrice, setBitcoinPrice] = useState<[]>([]);
+  const [bitcoinVolume, setBitcoinVolume] = useState<[]>([]);
+  const [todaysDate, setTodaysDate] = useState<string>("");
+  const [todaysPrice, setTodaysPrice] = useState<number>(0);
   useEffect(() => {
     axios
       .get(
@@ -43,20 +45,86 @@ export default function LineChart() {
         setBitcoinVolume(res.data.total_volumes);
       })
       .catch((err) => err);
+    axios
+      .get(
+        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&precision=2"
+      )
+      .then((res) => {
+        setTodaysPrice(res.data.bitcoin.usd);
+      })
+      .catch((err) => err);
+    const dateObject = new Date();
+    const formattedDate = format(dateObject, "MMM dd, yyyy");
+    setTodaysDate(formattedDate);
   }, []);
 
-  const options = {
+  interface CustomChartOptions extends ChartOptions {
+    height?: number;
+    width?: number;
+    scales?: {
+      x?: {
+        type?: "linear";
+        min?: number;
+        max?: number;
+        grid?: {
+          display?: boolean;
+        };
+        ticks?: {
+          display?: boolean;
+          font?: {
+            size?: number;
+          };
+        };
+      };
+      y?: {
+        type?: "linear";
+        ticks?: {
+          display?: boolean;
+        };
+        grid?: {
+          display?: boolean;
+        };
+      };
+    };
+  }
+
+  const options: CustomChartOptions = {
     responsive: true,
     plugins: {
       title: {
         display: false,
-        text: "Bitcoin",
+      },
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+      },
+      subtitle: {
+        display: true,
       },
     },
     scales: {
       x: {
         min: 150,
         max: 180,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: true,
+          font: {
+            size: 14,
+          },
+        },
+      },
+      y: {
+        ticks: {
+          display: false,
+        },
+        grid: {
+          display: false,
+        },
       },
     },
   };
@@ -93,11 +161,18 @@ export default function LineChart() {
   };
 
   return (
-    <main>
-      <div>
-        <h1>Bitcoin</h1>
-        {<Line options={options} data={data} />}
+    <div
+      className="rounded-2xl p-4 w-1/2 h-full text-white"
+      style={{ background: "rgb(20, 20, 30)" }}
+    >
+      <div className="p-4 z-40 absolute">
+        <h3 className="text-2xl">Bitcoin</h3>
+        <h2 className="text-4xl">${todaysPrice}</h2>
+        <h3 className="text-2xl">{todaysDate}</h3>
       </div>
-    </main>
+      <div className=" h-full">
+        <Line className="" options={options} data={data} />
+      </div>
+    </div>
   );
 }
