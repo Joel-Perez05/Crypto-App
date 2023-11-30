@@ -152,7 +152,7 @@ export default function BarChart() {
     labels,
     datasets: [
       {
-        label: "Bitcoin Price",
+        label: "24h Volume",
         data: bitcoinVolume.map((volume) => volume[1]),
         tension: 0.4,
         borderColor: "#00FF5F",
